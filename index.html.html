@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agroecological Transition — Stakeholder Explorer</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f4f0;
+    color: #1a1a18;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #fff;
+    border-bottom: 1px solid #e0ddd5;
+    padding: 1.5rem 2rem;
+  }
+
+  header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a18;
+    margin-bottom: 4px;
+  }
+
+  header p {
+    font-size: 14px;
+    color: #6b6b66;
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: #9b9b94;
+    margin-bottom: .6rem;
+    margin-top: 1.5rem;
+  }
+
+  .section-label:first-of-type { margin-top: 0; }
+
+  .stakeholder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: .5rem;
+  }
+
+  .sh-btn {
+    background: #fff;
+    border: 1px solid #e0ddd5;
+    border-radius: 12px;
+    padding: 14px 10px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color .15s, background .15s, transform .1s;
+    position: relative;
+  }
+
+  .sh-btn:hover {
+    border-color: #b8b5ad;
+    background: #fafaf8;
+    transform: translateY(-1px);
+  }
+
+  .sh-btn.active {
+    border-width: 2px;
+  }
+
+  .sh-btn .icon { font-size: 24px; margin-bottom: 7px; display: block; }
+  .sh-btn .name { font-size: 12px; font-weight: 600; color: #1a1a18; line-height: 1.3; }
+  .sh-btn .role { font-size: 11px; color: #6b6b66; margin-top: 3px; line-height: 1.3; }
+
+  .detail-panel {
+    background: #fff;
+    border: 1px solid #e0ddd5;
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    animation: fadeUp .2s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0ede6;
+  }
+
+  .panel-icon {
+    font-size: 36px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .panel-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a18;
+    margin-bottom: 3px;
+  }
+
+  .panel-blurb {
+    font-size: 13px;
+    color: #6b6b66;
+    line-height: 1.6;
+  }
+
+  .persp-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .persp-btn {
+    flex: 1;
+    min-width: 130px;
+    padding: 9px 12px;
+    border: 1px solid #e0ddd5;
+    border-radius: 8px;
+    background: #fafaf8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #6b6b66;
+    transition: all .15s;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .persp-btn:hover {
+    border-color: #b8b5ad;
+    color: #1a1a18;
+    background: #f5f4f0;
+  }
+
+  .persp-btn.active {
+    background: #fff;
+    border-width: 2px;
+    color: #1a1a18;
+    font-weight: 600;
+  }
+
+  .persp-desc {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .75rem;
+  }
+
+  .content-block { animation: fadeUp .18s ease; }
+
+  .content-block p {
+    font-size: 14px;
+    color: #2c2c28;
+    line-height: 1.75;
+  }
+
+  .content-block ul { list-style: none; padding: 0; }
+
+  .content-block ul li {
+    font-size: 13.5px;
+    color: #2c2c28;
+    line-height: 1.6;
+    padding: .55rem 0 .55rem 1.3rem;
+    border-bottom: 1px solid #f0ede6;
+    position: relative;
+  }
+
+  .content-block ul li:last-child { border-bottom: none; }
+
+  .content-block ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #b8b5ad;
+    font-size: 12px;
+    top: .65rem;
+  }
+
+  .hint {
+    font-size: 13px;
+    color: #9b9b94;
+    text-align: center;
+    padding: 1.5rem 0 .5rem;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: #9b9b94;
+    padding: 2rem 1rem;
+    border-top: 1px solid #e0ddd5;
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Agroecological Transition — Stakeholder Explorer</h1>
+  <p>Explore the ideal roles, common challenges and entry points of different stakeholder groups in the agroecological transition. Click a stakeholder to learn more.</p>
+</header>
+
+<div class="container">
+
+  <div class="section-label">Value chain actors</div>
+  <div class="stakeholder-grid" id="grid-vc"></div>
+
+  <div class="section-label">Enabling environment</div>
+  <div class="stakeholder-grid" id="grid-ee"></div>
+
+  <div id="panel-area"></div>
+
+  <p class="hint" id="hint">Click any stakeholder card above to explore their role in the agroecological transition.</p>
+
+</div>
+
+<footer>
+  Based on a systematic literature review on stakeholder roles in the agroecological transition.<br>
+  Content derived from Table 5: Stakeholder descriptions, ideal roles, key challenges, and entry points.
+</footer>
+
+<script>
+const COLORS = {
+  teal:   { bg:'#E1F5EE', border:'#0F6E56', text:'#085041', light:'#9FE1CB' },
+  green:  { bg:'#EAF3DE', border:'#3B6D11', text:'#27500A', light:'#C0DD97' },
+  amber:  { bg:'#FAEEDA', border:'#854F0B', text:'#633806', light:'#FAC775' },
+  coral:  { bg:'#FAECE7', border:'#993C1D', text:'#712B13', light:'#F5C4B3' },
+  pink:   { bg:'#FBEAF0', border:'#993556', text:'#72243E', light:'#F4C0D1' },
+  blue:   { bg:'#E6F1FB', border:'#185FA5', text:'#0C447C', light:'#B5D4F4' },
+  purple: { bg:'#EEEDFE', border:'#534AB7', text:'#3C3489', light:'#CECBF6' },
+};
+
+const STAKEHOLDERS = [
+  {
+    id:'input', group:'vc', icon:'🌱', name:'Input provider', role:'Seeds, fertilizers, tools', color:'teal',
+    blurb:'Input providers produce, sell, deliver and advise on inputs to farmers and/or processors. They are highly influential on which inputs — and implicitly which production philosophies — are seen as available and legitimate.',
+    idealRole:'Provide diverse, affordable, easily applicable, effective inputs that are ecofriendly and locally sourced — embodying the principles of diversity, efficiency, recycling, and circular economy. Listen to customer feedback and challenges. Provide inclusive agronomic advice to customers that is impartial, fitting with local cultural and agro-ecosystems, especially considering the realities of women and youth. Engage in agroecology as a science (considering and enriching the evidence related to their inputs), as a practice (providing sustainable production factors to farmers and processors) and as a movement (collaborating with other actors in the value chain and enabling environment to increase demand for agroecological inputs).',
+    challenges:[
+      'Lack of awareness of agroecological inputs or how to advise on them',
+      'Time constraints for learning about agroecology and providing nuanced explanations on novel and diverse AE inputs',
+      'Lack of storage space for bulky organic products such as compost',
+      'Greater quality fluctuations in AE inputs require more time and cost for quality assurance and communication among stakeholders',
+      'Financial barriers: specialising in AE inputs limits the business portfolio; input providers cannot afford to have everything in stock',
+      'Lower demand: AE products perceived as more expensive or untrustworthy (self-made or from less well-known manufacturers)',
+      'Market disincentives: strong incentive to continue selling conventional products and reinforce the "more is better" narrative',
+      'Policy disincentives: subsidies guarantee demand and margins for conventional inputs',
+      'Philosophical resistance: agroecology may be seen as opposing technical, market-led innovation',
+    ],
+    entryPoints:[
+      'Gain clarity on what AE inputs are: use the TAPE tool to better understand AE principles and how to support farmers and other stakeholders',
+      'Build awareness and advise other stakeholders on what AE inputs are available and fitting for their farm and food system context',
+      'Develop smart outreach: information materials (flyers, videos) for each AE input to save time and efficiently inform clients',
+      'Develop smart logistics: joint, lean and digital solutions to make purchases, storage and delivery more efficient and less costly',
+      'Share success stories: sensitise and train farmers on good organic input use, develop champions and influencers within farming communities',
+      'Make AE inputs more available and affordable: engage in last-mile distribution models',
+      'Specialise and stand out: offer niche products to strengthen credibility and serve system diversification and resilience',
+      'Develop integrated business models: even if not offering AE inputs, refer to specialised AE input providers and negotiate a commission',
+    ],
+  },
+  {
+    id:'farmer', group:'vc', icon:'🚜', name:'Farmer', role:'Crops, livestock, land stewardship', color:'green',
+    blurb:'Farmers grow crops or rear livestock. They are stewards of land (soil), manage inputs, pests and coordinate production, sell produce, link to extension agents for information, and to retailers and consumers for sales. Farmers are key "knowledge holders", educators and "movement makers" in farm and food systems.',
+    idealRole:'Produce agricultural commodities and integrate production with local food systems based on all 10 agroecological principles: diversity (growing diverse crops, rearing diverse livestock, diverse on- and off-farm income sources); resilience (stable income, production and effective social safety networks); synergies (integrated farm and food systems); efficiency (using optimal amounts and combinations of inputs, recycling on-farm resources, integrated pest management, meeting household needs); recycling (optimising on-farm nutrient recycling and resource use across system components, reduction/reuse and recycling of imported non-biodegradable materials); circular and solidarity economy (purchasing local inputs, selling own produce locally, active in inclusive producer networks, sharing materials, equipment or labour); co-creation and sharing of knowledge (experimenting, learning from and sharing knowledge with other stakeholders); culture and food traditions (valuing local, nutritious dishes and rituals that maintain diversity in food production and consumption); human and social values (women and youth empowered to participate, lead and benefit; safe and adequately remunerated labour; good animal welfare); and responsible governance (secure access to own and communal production factors).',
+    challenges:[
+      'Lack of awareness of AE practices, their costs and benefits',
+      'Lack of knowledge to implement AE practices — which require new or more knowledge than conventional farming (training, time, risks)',
+      'Isolated AE experiences in production, distribution and consumption',
+      'Inaccessible extension services',
+      'Lack of farmer–researcher collaboration: collaborations are few and those that exist usually give farmers weak roles or level of control over co-creation of knowledge',
+      'Complexity of information: AE practices require a sophisticated understanding of ecological relationships on farm',
+      'Possibly higher costs without price premium for agroecologically produced food',
+      'Skewed knowledge systems: agricultural education, extension and political narratives favour conventional agriculture including monocultures, synthetic fertilisers and purchased seeds',
+      'Distorted incentives: NGOs and private sector companies may give away conventional inputs at no or low cost, prioritising quick production gains over sustainability',
+      'Lack of labour to implement AE practices',
+      'Profitability pressure: commercial farm decisions are often taken to maximise profitability',
+      'Inertia of existing logistics: farmers in conventional systems are isolated producers, mainly embedded in commercial rather than communal systems — shifting requires re-thinking, re-structuring and building new relationships',
+      'Image problem: e.g. in Uganda, using "dirty manure" is compared to using "the clean white stuff" (synthetic fertiliser), perceived as more modern',
+    ],
+    entryPoints:[
+      'Farmer-to-farmer knowledge exchanges (multiplier effect — trial and error among farmers and talking about it)',
+      'Farmer-to-farmer hands-on demonstrations: seeing results first-hand inspires other farmers to try out new practices',
+      'Farmer-to-farmer resource exchanges: organise and participate in seed-sharing fairs',
+      'Systematic evaluation and identification of opportunities for a more AE production: use TAPE tool guidance on production methods and linkages across the food system',
+      'Incorporate AE practices that help bring costs down by replacing external inputs',
+      'Direct sales to consumers through subscription models',
+      'Organise in groups (e.g. Farmer-Based Organizations, Communities of Practice) for joint learning, mutual support, coordination of production and sales, outreach and political influence',
+      'Build momentum for scaling AE: moral (social legitimacy), organisational (structuring processes) and human (knowledge) contributions',
+      'Engage in representative or transformative participation in research — not merely as passive data sources',
+    ],
+  },
+  {
+    id:'processor', group:'vc', icon:'🏭', name:'Processor', role:'Transformation & packaging', color:'amber',
+    blurb:'Processors are individuals, or small, medium or large enterprises (informal or formal) that add value to a product by processing it and/or packaging/labelling it. They obtain products from farmers and sell to retailers/consumers.',
+    idealRole:'Connect to farmers, retailers and consumers through transparency and traceability of diverse, nutritious, culturally significant products. Use predominantly local products and sustainable packaging, produced circularly. Make agroecological products and their values and advantages visible. Be flexible with delivery time and product quality, allowing farmers to sell most produce, even when timing and aesthetics are not ideal. Recycle byproducts and return them to farms to promote soil fertility or use them for bioenergy production.',
+    challenges:[
+      'Difficulties in reliably sourcing AE-produced products (AE producers often try to process and market products themselves to keep value addition as local as possible)',
+      'Little insight or knowledge on production systems and their social and environmental performance (low transparency, traceability)',
+      'Difficulty communicating the environmental and social benefits of AE products in order to effectively translate these into price premiums',
+      'Inertia of existing commercial system: large-scale processors have deals with supermarkets — there are established commercial links which are lucrative and practical',
+      'Variability in procured product qualities (e.g. sizes, hardness) implies higher required attention in processing them',
+      'Consumer or industry price pressure forces processors to source raw materials at best price',
+      'Aim to provide visually appealing, standardised products to retailers and consumers',
+      'Low concern for environmental footprint of products',
+    ],
+    entryPoints:[
+      'Connect to farmers and consumers in the geographic area to foster short distances and transparent information exchanges (trust) among value chain actors',
+      'Inquire about the tangible quality differences between AE and non-AE products',
+      'Use the TAPE to understand which producers (suppliers of raw materials) are more or less agroecological',
+      'Experience and communicate differences in quality (taste, durability) between AE and non-AE products; market these differences and ask for a price premium largely passed on to farmers',
+      'Create awareness among retailers, vendors and consumers for the value of non-standardised produce',
+      'Preserve the nutritional value of the food through choice of processing techniques',
+      'Recycle by-products and return them to farms',
+    ],
+  },
+  {
+    id:'retailer', group:'vc', icon:'🛒', name:'Retailer / vendor', role:'Sales to consumers', color:'coral',
+    blurb:'Small, medium or large enterprises (informal or formal) that buy products from farmers, intermediaries or processors and sell them to consumers. Their purchasing decisions significantly influence the supply chain and sustainability outcomes.',
+    idealRole:'Offer agroecologically, locally produced, diverse, culturally significant products. Source directly from farmers or from agroecologically engaged processors and intermediaries. Be flexible with delivery time and product quality, allowing farmers to sell most produce, even when timing and aesthetics are not ideal. Minimise food waste by efficient distribution systems and involvement in food waste recycling channels for added value. Advertise agroecological products visibly and attractively to consumers. Accept lower margins to offer agroecological products at competitive pricing; build trust with producers, processors and consumers.',
+    challenges:[
+      'Disconnect from local producers',
+      'Low transparency and traceability of products and production methods',
+      'Difficulty in communicating environmental and social benefits of AE products to justify a price premium',
+      'Pressure to offer year-round, standardised, aesthetically optimised produce to consumers — often internationally sourced and independent of season — with pricing that reflects subsidy policies and market dynamics without accounting for social and environmental impacts',
+      'Lack of mandatory minimum social and environmental standards for produce',
+      'Priority on consistent quality and price over sustainability considerations',
+    ],
+    entryPoints:[
+      'Use the TAPE to understand which producers (suppliers of raw materials) are more or less agroecological',
+      'Strengthen direct linkages with producers, processors and consumers',
+      'Participate in sustainability initiatives including certifications',
+      'Effective promotion of agroecology: marketing strategies and creation of market channels for AE-produced food; set up collaborative supermarkets',
+      'Invest in solar-powered cold storage or transportation',
+      'Prioritise AE products in public procurement so that retailers/vendors of these get rewarded and a strong market signal is sent',
+      'Target behaviour change interventions for retailers in global supply chains for supporting sustainability outcomes',
+    ],
+  },
+  {
+    id:'consumer', group:'vc', icon:'🍽️', name:'Consumer', role:'Food purchase & consumption', color:'pink',
+    blurb:'Rural or urban individuals, households or commercial consumers (such as hotels, conference venues, etc.) who purchase and consume raw or processed products from producers, processors, vendors or retailers. Consumers drive demand and thus production.',
+    idealRole:'Care about the environmental footprint and social impact of the food they purchase and consume — they are willing to pay a price premium for locally produced, fair-trade certified, healthy, seasonal, fresh, nutritious food and livestock products from farms with high animal welfare standards. Value traditional foods and food rituals that maintain diversity in food production and consumption. Compost organic waste and minimise food waste. Purchase "non-standard looking produce" to prevent food waste and appreciate deviations in natural products. Purchase directly from farmers or AE-conscious processors and retailers. Endorse particular producers, products or brands.',
+    challenges:[
+      'Unaware of the added value of AE products, nor the benefits of diversity and sustainability in food products — for themselves or for the system as a whole',
+      'Spatial distance between consumers and producers: especially urban consumers are disconnected from rural producers',
+      'Unclear origin and benefits (environmental and social) of agroecologically produced food',
+      'AE as pretext: some policy makers have co-opted the concept of agroecology to promote "sustainable intensification" — this is difficult to distinguish for consumers',
+      'Confusion about the multitude of labels and what they mean',
+      'Lack of knowledge used as an excuse for buying the cheapest option: many consumers have no interest in knowing more about the social and environmental impact of their purchases since it would make them more expensive',
+      'Financial and time constraints for participating in direct markets or participatory guarantee systems',
+      'Financial constraints for purchasing certified produce',
+    ],
+    entryPoints:[
+      'Buy from farmers markets',
+      'Get informed on environmental and social performance of consumption choices',
+      'Pay a price premium for locally produced, fair-trade certified, healthy, seasonal, fresh, nutritious, non-standard-looking food and livestock products with high animal welfare standards',
+      'Use the TAPE to understand which producers (suppliers of raw materials) are more or less agroecological',
+      'Recycle organic waste to be used as an input for farming',
+      'Contribute material (funds) and moral (social legitimacy) support to scale AE',
+    ],
+  },
+  {
+    id:'policymaker', group:'ee', icon:'🏛️', name:'Policy maker', role:'Policy, budgets, strategies', color:'blue',
+    blurb:'Politicians, ministers, administrative staff involved in policy making and implementation. Policy makers shape the enabling environment for other actors through policies, guidelines, master plans and strategies, dedicated budgets and targets.',
+    idealRole:'Visit and engage in discussions with all value chain and enabling actors; understand their bottlenecks and needs for engaging into the AE transition. See the larger picture and need for more sustainable food systems, to the benefit of all. Know that investment costs into sustainable food systems will save costs later due to greater health and resilience of the food system. Empower AE actors and the AE transition through favorable policies, guidelines, master plans and strategies. Allocate dedicated budgets for AE and targets for inclusiveness (e.g. for the involvement of women and youth in policy formulation, their minimum participation in interventions, or dedicated budgets for them). Contribute to policies that are clear and committed to the AE transition with no contradictions in the legal framework and clear responsibilities among ministries, so that the policy landscape at all levels works together in a concerted manner.',
+    challenges:[
+      'Lack of awareness about AE (practices, societal impacts)',
+      'Lack of experience and practical examples',
+      'Lack of direct utility for themselves: do they get more votes if they would promote agroecology?',
+      'Lack of evidence on the costs and benefits of (different extents of) agroecological transition of local, national or regional food systems',
+      'Lack of knowledge and complexity: difficulties in guiding and communicating the AE transformation process',
+      'Stopping subsidies might deter voters: government support is strongly geared towards large-scale commercial and conventional agricultural production, and a strong conventional farming lobby does not agree to shift incentives',
+      'Favouring incremental rather than transformational change — while AE is transformational',
+      'Difficulty in monitoring and evaluation: to assess whether land management is meeting society\'s needs while also maintaining healthy and sustainable ecosystems',
+    ],
+    entryPoints:[
+      'Visit and talk to stakeholders in the value chain and enabling environment to gain first-hand experience on barriers and opportunities for the AE transition',
+      'Visit "lighthouse farms" where AE transition has happened and others can learn from: learn about what is possible and realistic, what are the costs and benefits',
+      'Use the TAPE to understand which producers are more or less agroecological',
+      'Bring stakeholders together so they meet and encourage farmer-to-farmer exchanges; foster collaboration capacity among actors in innovation systems',
+      'Foster (fund, encourage) rural innovation laboratories for practical, experimental and situated rural education; foster knowledge exchanges',
+      'Fund infrastructure and research that contribute to the AE transition: public sector research and development of AE inputs and production, participatory pilots and demonstrations, and curriculum development',
+      'Build leadership capacity of communities (input providers, farmers, processors, consumers, local extension agents)',
+      'Show commitment to make extension services more efficient and effective; upskilling of extension services',
+      'Adopt political stance to value products produced by small agroecological farmers, e.g. through school programmes and public procurement initiatives',
+      'Agrarian reform: contribute to an enabling policy environment including financial support (subsidies) for investments into the AE transition; improve access to AE inputs, credit, markets and trade; support recovery and strengthening of local seed systems; contribute to policies that protect farmers/communities from land grabbing; work towards coherent policies; establish and adhere to responsible and inclusive governance mechanisms at different scales',
+    ],
+  },
+  {
+    id:'ngo', group:'ee', icon:'🤝', name:'NGO / multilateral staff', role:'Coordination, outreach, support', color:'teal',
+    blurb:'Staff working for NGOs or multilaterals typically engaged in coordination and outreach activities as part of international, regional, national or local initiatives that care for particular environmental or social causes. NGOs often step in when governments lack funding or commitment to matters of livelihoods, justice or sustainability.',
+    idealRole:'Provide practical information and services (e.g. connecting actors, trainings) at no or low cost. NGOs can offer things that communities or social movements are unable to access on their own.',
+    challenges:[
+      'Lack of awareness about AE among NGO staff',
+      'Lack of knowledge and communication materials on environmental and social benefits of AE practices',
+      'Inertia of existing food system: challenge in promoting AE in the hegemony of conventional food circuits — little market demand for AE produce, a less developed value chain and consumption',
+      'Lack of resources for implementation: dependent and adversely affected by decrease of financial resources from abroad; chronically underfunded for training of own staff and awareness raising in target population',
+      'Limited reach and visibility: mostly local and subnational-level NGOs promote AE research and practices, with limited capacity and visibility to influence national level agendas for scaling out',
+      'Unfavorable power dynamics — external: community-based local organisations can be overwhelmed by internal inequities and social injustices, with decisions taken by the powerful at the expense of the relatively powerless',
+      'Unfavorable power dynamics — internal: when international NGOs are headquartered in the Global North, there might be power dynamics in funding agendas/priorities that are not localised agendas in line with agroecological good governance and localised solutions',
+      'Lack of strategic alignment and federated organisational structure',
+    ],
+    entryPoints:[
+      'Visit and talk to actors in the value chain and enabling environment to gain first-hand experience on barriers and opportunities for the AE transition',
+      'Foster knowledge exchanges: mobilise farmers towards local knowledge exchanges; visit lighthouse farms',
+      'Set up AE demonstration farms',
+      'Use the TAPE to understand which producers are more or less agroecological and to collect evidence on the agroecological transition and "weak spots" that deserve attention and support',
+      'Invite different AE stakeholders to trainings',
+      'Co-develop and implement action-agendas: harness critical place-based education and horizontal social methodologies for transformation "from within"',
+      'Contribute to scaling AE: publicity, material resources (funds), moral (social legitimacy), organisational (structuring processes) and human (knowledge) contributions',
+    ],
+  },
+  {
+    id:'extension', group:'ee', icon:'👩‍🌾', name:'Extension agent', role:'On-farm visits & demonstrations', color:'green',
+    blurb:'Public or private extension agents who inform farmers on "best practices" in crop and livestock production. They play a key (multiplier) role in the AE transition, entailing a shift from input-intensive to knowledge-intensive production systems.',
+    idealRole:'Through regular on-farm, in-person visits and demonstrations, provide diverse AE knowledge to individual producers and groups, while producers also provide their knowledge and observations to extension agents. Co-creation and sharing of knowledge, responsible governance, human and social values.',
+    challenges:[
+      'Lack of knowledge on environmental and social benefits as well as exact costs of agroecological practices; AE often not explicitly part of the extension curriculum; knowledge intensity of AE practices can be challenging',
+      'Chronically underfunded public extension: only few field visits are made per year; few agents are assigned to many farmers (sometimes 1:1,000), leading to providing general rather than individualised/tailored advice',
+      'High administrative burden: leaving less time for analysing complex systems and for providing tailored advice on them',
+      'Top-down approach still dominant in agricultural extension due to time constraints in on-farm visits as well as the extension education',
+      'Contradictory agendas/ideologies: hesitant to promote e.g. cover crops if these were previously discouraged; there might be trade-offs between ecological objectives and profitability with a different prioritisation of these between farmers, government and extension agents',
+      'Commercialisation of extension services: there is a trend in commercialising extension services, leading to a transformation of advising practices and to increased tensions between providing public and commercial services among advisors',
+    ],
+    entryPoints:[
+      'Get informed and have an own critical analysis of information offered',
+      'Provide evidence that supports farmers in informed decision-making, reducing farmers\' risk aversion and uncertainty',
+      'Adopt farmer-centric learning, communication and planning approaches: place farmers\' knowledge and visions into the centre of plans and conversations; extension agents to change their role from "consultants on operational and tactical decisions to supporters of the process of planning and evaluations of farm systems"; be responsive to farmers\' indigenous knowledge and innovations; allow farmers to be experimenters rather than passive recipients; train to lead a dialogue with a farmer\'s reality, not simply seeking to know it, but to jointly transform it',
+      'Be versatile, nuanced and effectively represent all groups of farmers in terms of their learning and resource needs',
+      'Provide impartial advice to farmers: not sell them anything unless it is the best option among many',
+      'Link to lighthouse farmers to exemplify successful practice of AE practices and resulting benefits',
+      'Engage in or encourage evidence-based digital extension to reach more farmers and complement in-person presence',
+    ],
+  },
+  {
+    id:'teacher', group:'ee', icon:'🎓', name:'Teacher', role:'Education & curriculum', color:'purple',
+    blurb:'School or university teachers who provide an overview of agricultural frameworks and practices (incl. impacts and trade-offs) to their students.',
+    idealRole:'Communicate AE elements and practices to students, listen to students\' experiences, let them exchange and debate their experiences, offer hands-on research trials, exemplify (lead, live, demonstrate) knowledge sharing. Set up dialogues with other stakeholders in the agricultural value chain and the enabling environment. Connect school gardens with e.g. the canteen and thus with consumers. As part of a larger curriculum on food systems or sustainability, students learn about best practices, costs and benefits of agroecological practices, with examples being location specific.',
+    challenges:[
+      'Lack of knowledge on environmental and social benefits of agroecological practices; lack of experience and practical examples',
+      'Understanding the formal concept of AE: some teachers felt that the AE formal concepts do not fit well with their daily personal and professional realities',
+      'Lack of communication skills including language barriers: when teachers commute from urban to rural areas they are not embedded in local realities and do not speak local indigenous languages',
+      'Lack of incentives for students to engage at university: some faculty members may have partnerships with large agribusiness multinationals, attracting students with well-paid internships',
+      'Teaching specialisation: agricultural graduate programs are typically taught by specialists, covering specific disciplines and subjects rather than teaching interdisciplinary approaches',
+      'Disagreement on teaching contents: differences in jargon, cultural norms and ideologies can be challenging in curricular development',
+    ],
+    entryPoints:[
+      'Get informed and critically analyse information sources offered',
+      'Use school gardens to raise awareness and build practical competencies in agroecology',
+      'Develop a "living curriculum": active and experiential learning programs (excursions to farms, cooperatives, hands-on learning activities); use inter- and transdisciplinary approaches; student-centred and self-determined learning; reflective, collaborative synergetic learning; holistic learning (head, hands and heart); epistemic pluralism',
+      'Transform from teacher into co-learner',
+      'Bring practitioners and activists into the classroom as instructors and knowledge resources; offer agroecological training programmes based on "real-world" interactions',
+      'Open classes/courses to a broader audience: teachers can provide their courses/lectures for a broader audience who will act as multipliers of agroecological knowledge in society',
+      'Seek alliances with public bodies to foster "political and institutional mediation"',
+      'Encourage procurement of school meals according to AE criteria: team up with other teachers, engage students and reach out to school management',
+      'Suggest internships/collaborations with sustainability actors',
+      'Integrate diverse perspectives: broad community of AE interests while accepting controversies',
+      'Ensure handing-over of knowledge from one teacher generation to another: set up educational succession plans',
+    ],
+  },
+  {
+    id:'researcher', group:'ee', icon:'🔬', name:'Researcher', role:'Evidence & knowledge production', color:'amber',
+    blurb:'National or international scientists who execute or shape agricultural research agendas to expand and communicate scientific evidence on costs and benefits of AE, as well as success factors and obstacles towards achieving the AE transition.',
+    idealRole:'Expand and communicate scientific evidence on costs and benefits of AE as well as success factors and obstacles. Researchers lead or accompany the co-creation and sharing of knowledge, they listen to societal demands for evidence (by all value chain actors and enablers), translate complex findings into actionable recommendations for joint progress in the AE transition.',
+    challenges:[
+      'Lack of awareness and interdisciplinary experience to recognise and incorporate the perspective of farmers and indigenous people into research projects',
+      'Working in isolation: AE researchers do not seem to consistently collaborate, even if they are aligned on their vision and mission',
+      'Conceptual disagreements and collaborations: even when collaborating, researchers might not share the same definition of AE',
+      'Limited funding for AE research: e.g. in Uganda, agricultural research focuses on yield maximisation, single crops rather than farming systems, conventional inputs and monoculture systems',
+      'Narrow stakeholder focus: research focuses on the perspective of farmers and policy makers; other value chain actors are often neglected in research',
+      'Research for researchers: criticism that research on AE has remained self-reflexive i.e. focusing on the definition and evolution of the concept of AE instead of how to get science from reflection to action',
+      'Strong mainstream agricultural development narratives (capitalistic, neoliberal) require independent, critical reflection and taking own stance, which might not be popular and might imply forgoing financial benefits from more commercially oriented partnerships',
+      'Limited budget to disseminate AE research findings',
+      'Scattered, inhomogeneous, partly inaccessible data sets on AE across sites',
+      'Colonial mindset: "Western scientific understanding has long been privileged as ideal leading to the erasure of non-scientific knowledge including experiential, spiritual, artisanal, and indigenous forms"',
+    ],
+    entryPoints:[
+      'Engage with agroecological norms and discourse to prompt active reflection on alternative system possibilities and own role',
+      'Engage in trans-disciplinary conversations: work on getting conversant in each other\'s disciplinary languages to jointly address the wide range of social, ecological, cultural and economic barriers',
+      'Define knowledge gaps',
+      'Engage in student-led learning approaches',
+      'Create transdisciplinary, multi-actor partnerships/networks and collective projects to unfold transformative dynamics; engage in cross-learning processes between researchers and other AE actors that support the exploration of transition pathways',
+      'Collaborative and equitable knowledge development: enable the true co-creation of knowledge by adhering to principles such as listening and empathy, mutual respect, flexibility, follow-through, trust and relationship building; employ "engaged listening, storytelling, and generative — not extractive — approaches"',
+      'Avoid inequalities and power asymmetries when working with other actors, especially farmers; consider Participatory Action Research (PAR) in agroecology',
+      'Set clear and transparent standards to measure agroecological performance of farm systems (e.g. TAPE)',
+      'Raise awareness of evidence-based AE success cases; support farmers and policy makers to identify strengths and weaknesses of AE systems and food systems',
+      'Raise funds for further AE research; talk to financial institutions to raise awareness on benefits and the profitability of AE production',
+    ],
+  },
+  {
+    id:'financial', group:'ee', icon:'💰', name:'Financial staff', role:'Credit, savings & investment', color:'coral',
+    blurb:'Staff at financial institutions (rural banks, microfinance institutions, national banks) who decide over the credit-worthiness of farmers and other business men/women and their investments. They provide financial services (saving accounts, credit lines, investment portfolios, insurances) to AE stakeholders.',
+    idealRole:'Provide financial services (saving accounts, credit lines, investment portfolios, insurances) to AE stakeholders. Assess investment proposals of e.g. input providers, farmers (and cooperatives), processors and retailers as well as NGOs. Advertise their services to potential customers and listen to feedback on what stakeholders need for the economic planning of their AE activities.',
+    challenges:[
+      'Lack of knowledge on environmental and social benefits of agroecological practices; missing "return on investment" calculations for agroecological versus conventional farming business models',
+      'Diversity and complexity of AE investments: individual case-by-case evaluation of the business and impact case makes it time and cost intensive for banks to review agroecological cases',
+      'Preference for large-scale simple agri-businesses rather than diverse or complex small-scale ones; credit schemes prefer "larger businesses", outgrower schemes or selected cash crops',
+      'Credit schemes require collateral and fixed repayments independent of harvesting times and yields; microcredits (pro-poor) require monthly repayments, more adapted to micro-businesses',
+      'Familiarity with and formality of financing conventional inputs rather than supporting the purchase of local materials',
+      'Perception of high risk to invest in agroecological projects due to a long conversion period that may result in reduced yields and lower financial returns, as well as high costs (labour, insurance etc.)',
+    ],
+    entryPoints:[
+      'Finance AE projects and investments',
+      'Use the TAPE to understand which producers are more or less agroecological; e.g. set minimum criteria to recognise a customer as committed to agroecology',
+      'Contribute to scaling AE: publicity, material (funds) and organisational (structuring processes) contributions',
+      'Funding AE projects/investments is an opportunity for financial institutions to showcase environmental and social engagement',
+    ],
+  },
+];
+
+const PERSPECTIVES = [
+  { id:'role',         label:'Ideal role',         desc:'What this stakeholder ideally contributes to the agroecological transition' },
+  { id:'challenges',   label:'Common challenges',   desc:'Barriers this stakeholder typically faces' },
+  { id:'entryPoints',  label:'Entry points',        desc:'Concrete actions this stakeholder can take' },
+];
+
+let activeSH = null;
+let activePersp = 'role';
+
+function getColor(name) { return COLORS[name] || COLORS.teal; }
+
+function renderGrids() {
+  ['vc','ee'].forEach(group => {
+    const el = document.getElementById('grid-' + group);
+    el.innerHTML = STAKEHOLDERS.filter(s => s.group === group).map(s => {
+      const col = getColor(s.color);
+      const isActive = activeSH === s.id;
+      const activeStyle = isActive
+        ? `background:${col.bg};border-color:${col.border};border-width:2px;`
+        : '';
+      return `<button class="sh-btn${isActive ? ' active' : ''}"
+        style="${activeStyle}"
+        onclick="selectSH('${s.id}')">
+        <span class="icon">${s.icon}</span>
+        <span class="name">${s.name}</span>
+        <span class="role">${s.role}</span>
+      </button>`;
+    }).join('');
+  });
+}
+
+function renderPanel() {
+  const area = document.getElementById('panel-area');
+  const hint = document.getElementById('hint');
+
+  if (!activeSH) {
+    area.innerHTML = '';
+    hint.style.display = 'block';
+    return;
+  }
+
+  hint.style.display = 'none';
+  const sh = STAKEHOLDERS.find(s => s.id === activeSH);
+  const col = getColor(sh.color);
+
+  const tabs = PERSPECTIVES.map(p => {
+    const isActive = activePersp === p.id;
+    return `<button class="persp-btn${isActive ? ' active' : ''}"
+      style="${isActive ? `border-color:${col.border};color:${col.text};` : ''}"
+      onclick="selectPersp('${p.id}')">${p.label}</button>`;
+  }).join('');
+
+  const persp = PERSPECTIVES.find(p => p.id === activePersp);
+
+  let content = '';
+  if (activePersp === 'role') {
+    content = `<p>${sh.idealRole}</p>`;
+  } else {
+    const items = sh[activePersp];
+    content = '<ul>' + items.map(item => `<li>${item}</li>`).join('') + '</ul>';
+  }
+
+  area.innerHTML = `
+    <div class="detail-panel">
+      <div class="panel-header">
+        <div class="panel-icon">${sh.icon}</div>
+        <div>
+          <div class="panel-name" style="color:${col.text}">${sh.name}</div>
+          <div class="panel-blurb">${sh.blurb}</div>
+        </div>
+      </div>
+      <div class="persp-row">${tabs}</div>
+      <div class="persp-desc" style="color:${col.text}">${persp.desc}</div>
+      <div class="content-block">${content}</div>
+    </div>`;
+}
+
+function selectSH(id) {
+  if (activeSH === id) {
+    activeSH = null;
+  } else {
+    activeSH = id;
+    activePersp = 'role';
+  }
+  renderGrids();
+  renderPanel();
+}
+
+function selectPersp(id) {
+  activePersp = id;
+  renderPanel();
+}
+
+renderGrids();
+</script>
+</body>
+</html>
